@@ -1,0 +1,19 @@
+{
+  "name": "bun-redis-multiple-containers",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "redis": "^4.6.10"
+  },
+  "scripts": {
+     "start": "bun run index.ts"
+  }
+}

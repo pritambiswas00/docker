@@ -1,0 +1,139 @@
+Creating a DockerFile
+
+\\\\\\\\\\\\Process///////////
+
+Specify a base image
+|
+Run some commands to install additional programs
+|
+Specify a command to run on container start up
+
+COPY {path to folder to copy from on your machine relative to build context} {Place to cpy stuff to inside the container}
+
+Port Mapping -> docker run -p {incoming port}:{container port} image name/image id
+
+Connect to the container shell -> docker run -it {image name/image} id sh
+
+Setting up specific directory for the application -> WORKDIR {directory}
+
+To stop all the container at one using 'docker-compose down'
+
+To run the container in the background 'docker-compose up -d'
+
+//Restart Policies//
+
+'no' -> Never attempt to restart this container if it stops ir crashes.
+always -> If the container stops for any reason always attemot to restart it.
+on-failure -> Only restart if the container stops with an error code.
+unless-stopped -> Always restart unless the dev forcibly stop it.
+
+** When using no always use quote. In YAML raw no means false.
+
+docker run -p host_port:container_port -v /directory/node_modules -v ${pwd}:/app <image id> this will make docker volumne dynamic 
+
+
+
+
+
+
+
+
+1. Create an image that run redis server
+
+Folder -> redis-server
+
+FROM alpine   //First download the base image from the docker hub
+
+RUN apk add --update redis //Use that base image, and install redis and generate new image from it.
+
+CMD [ "redis-server" ] //Use previous base image to generate new image where start up command will be redis-server.
+
+2. Create an Bun server image that run on docker
+
+Folder -> bun-server
+
+FROM oven/bun:latest //Get the latest bun docker image
+
+WORKDIR /usr/app //Creating a working directory so that container directory doesn't conflict with app directory
+
+COPY package.json /usr/app/ //Copy package.json from root to container
+
+RUN bun install //Installing the dependencies for the bun to run.
+
+COPY ./ ./  //Copying other files so that if any files changes we dont have install the dependencies again.
+ 
+CMD [ "bun","start" ]  //Command to run the server.
+
+3. Creating multi container bun server with redis server
+
+Folder -> bun-redis-multiple-container
+
+FROM oven/bun:latest //Get the latest runtime
+
+WORKDIR /usr/app //Setting up the working directory
+
+COPY package.json /usr/app/ //Copy the package.json
+
+RUN bun install //Install dependencies
+
+COPY ./ ./ //Copy other files
+
+CMD [ "bun","start" ]   //Setting up the command.
+
+//This is the docker compose file//  //All of these services connect within the same network
+version: '3'  //Must provide the version
+services:     //Header what are the services running
+    redis-server:   //First Service name 
+      image: 'redis'   //Which image going to be used
+    bun-express:    //Setting up the second service
+      build: .      //Pointing to the DockerFile  to build this service
+      ports:        //Setting up the ports to access from the outside world
+        - "4001:8081"
+
+4. Production Grade Workflow
+
+Folder -> production grade Workflow
+
+Flow -->
+
+             Github Repo
+Feature Branch  -> { Pull Request for merge from feature to master }        Master Branch --> Travis CI (Will do the testing)  -> AWS Hosting
+|
+|
+Local Development 
+{ push the code the feature after made changes to the code }
+
+//For Dev version//
+** Inorder to run the dev dockerfile. docker build -f {filename} context
+
+FROM oven/bun:latest
+
+WORKDIR /usr/frontend
+
+COPY package.json /usr/frontend/
+
+RUN bun install
+
+COPY . .
+
+CMD [ "bun", "dev" ]
+
+**Note : docker run -p {host_port}:{container_port} -v directory_node_modules container -v ${PWD -> Absolute_path of the project}:/container_direct <image_id>
+This will allows you to reference of the project that actually running helps live reloading and reference of working directory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
