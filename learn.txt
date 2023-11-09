@@ -121,6 +121,9 @@ CMD [ "bun", "dev" ]
 **Note : docker run -p {host_port}:{container_port} -v directory_node_modules container -v ${PWD -> Absolute_path of the project}:/container_direct <image_id>
 This will allows you to reference of the project that actually running helps live reloading and reference of working directory
 
+Using NGnix for production server
+
+
 
 
 
